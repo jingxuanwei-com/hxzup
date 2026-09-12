@@ -8,18 +8,30 @@
 
 ## 一、目录结构
 
+更新器固定位于 `.minecraft/versions/<游戏名>/updater/`，路径确定无需查找：
+
 ```
-.minecraft/update/
-├── launcher-agent.jar              # 引导器（-javaagent 加载的入口）
-├── updater-1.0.0.jar               # 更新器 v1.0.0
-├── updater-1.0.1.jar               # 更新器 v1.0.1  ← 引导器会选这个
-├── updater-1.0.2.jar.new           # 下载中的新版本，尚未就绪
-├── config.json                     # 客户端配置
-└── .updater/
-    ├── local-version.json
-    ├── local-manifest.json
-    └── local-changelog.json
+.minecraft/
+├── versions/
+│   └── <游戏名>/                     ← 游戏版本目录（整合包名）
+│       ├── <游戏名>.json             ← 版本 JSON
+│       ├── <游戏名>.jar              ← 客户端 JAR
+│       └── updater/                  ← 更新器目录（固定位置）
+│           ├── launcher-agent.jar    # 引导器
+│           ├── updater-1.0.0.jar     # 更新器 v1.0.0
+│           ├── updater-1.0.1.jar     # 更新器 v1.0.1  ← 引导器选这个
+│           ├── config.json           # 客户端配置
+│           └── .updater/
+│               ├── local-version.json
+│               ├── local-manifest.json
+│               ├── local-changelog.json
+│               └── local-game-profile.json
+├── libraries/                         ← 共享库
+├── assets/                            ← 资源文件
+└── ...
 ```
+
+> `.minecraft` = updater 目录的**上 3 级**。`config.json` 中的 `gameDir` 字段可覆盖此默认路径。
 
 ---
 
