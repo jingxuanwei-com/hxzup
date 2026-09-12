@@ -12,8 +12,8 @@
 ## 一、目录结构
 
 ```
-.minecraft/update/（更新器所在目录）
-├── launcher-agent.jar             # 引导器（-javaagent 加载，详见 引导器/引导器.md）
+.versions/<游戏名>/updater/（更新器固定位置）
+├── launcher-agent.jar             # 引导器（-javaagent 加载，详见 引导器/README.md）
 ├── updater-1.0.0.jar              # 更新器本体（由引导器扫描选择最新版本）
 ├── config.json                    # 服务端地址 + 行为配置
 └── .updater/                      # 更新器内部数据（隐藏目录）
@@ -22,6 +22,8 @@
     ├── local-changelog.json       # 上次拉取的更新日志（用于展示）
     └── local-game-profile.json    # 上次拉取的游戏版本/加载器配置（可选）
 ```
+
+> `.minecraft` = updater 目录的**上 3 级**。`config.json` 中的 `gameDir` 字段可覆盖此默认路径。
 
 ---
 

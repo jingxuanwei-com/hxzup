@@ -244,32 +244,25 @@ global.directory / global.file  （全局默认）
 
 #### `.minecraft` 目录定位
 
-更新器需要自动定位 `.minecraft` 目录，因为更新器自身的位置不固定：
+更新器路径**固定**为：`.minecraft/versions/<游戏名>/updater/`
 
 ```
-可能的目录结构：
-├── .minecraft/update/                    ← 更新器在 .minecraft 内
-│   └── updater-1.0.0.jar
-├── 整合包名/.minecraft/update/           ← 更新器在整合包子目录内
-│   └── updater-1.0.0.jar
-├── 整合包名/update/                      ← 更新器直接在整合包目录下
-│   └── updater-1.0.0.jar
-└── 整合包名/更新器/                      ← 自定义目录名
-    └── updater-1.0.0.jar
+.minecraft/                                ← updater 上 3 级
+├── versions/
+│   └── <游戏名>/                          ← updater 上 1 级（游戏版本目录）
+│       ├── <游戏名>.json
+│       ├── <游戏名>.jar
+│       └── updater/                       ← 更新器所在目录
+│           ├── launcher-agent.jar
+│           ├── updater-1.0.0.jar
+│           ├── config.json
+│           └── .updater/
+├── libraries/
+└── assets/
 ```
 
-**定位规则（从更新器所在目录向上查找）：**
-1. 从 updater JAR 所在目录开始
-2. 逐级向上查找，找到包含 `versions/` 子目录的目录即为 `.minecraft`
-3. 最多向上查找 5 级，找不到则报错
-4. 也可以在 `config.json` 中手动指定 `gameDir` 字段覆盖自动检测
-
-```
-查找示例：
-updater 在 /游戏/整合包/.minecraft/update/
-  → 检查 /游戏/整合包/.minecraft/update/        → 无 versions/
-  → 检查 /游戏/整合包/.minecraft/                → 有 versions/  ✅ 找到
-```
+整合包作者只需将 updater 文件夹放到 `versions/<游戏名>/` 下即可。
+`config.json` 中的 `gameDir` 字段可覆盖此默认路径（用于特殊目录结构）。
 
 #### 版本 ID 命名约定
 
