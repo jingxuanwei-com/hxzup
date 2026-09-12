@@ -11,5 +11,10 @@
   "changelogDuration": 15,
   "autoCloseChangelog": true,
   "gameMainClass": "net.minecraft.client.main.Main",
-  "gameDir": ""
+  "gameDir": "",
+  "mirrorUrls": {
+    "modrinth": "https://mod.mcimirror.top",
+    "curseforge": "https://mod.mcimirror.top/curseforge",
+    "mojang": "https://bmclapi2.bangbang93.com"
+  }
 }

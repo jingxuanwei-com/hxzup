@@ -56,7 +56,9 @@
       "downloads": [
         "https://mediafilez.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
         "https://edge.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
-        "https://cdn.modrinth.com/data/Gi02250Z/versions/cHGan9fQ/Almanac-1.21.1-2-neoforge-1.5.2.jar"
+        "https://cdn.modrinth.com/data/Gi02250Z/versions/cHGan9fQ/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://mod.mcimirror.top/data/Gi02250Z/versions/cHGan9fQ/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://mod.mcimirror.top/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar"
       ]
     }
   ]
@@ -74,7 +76,7 @@
 | `downloads` | 下载地址列表（可选），多个 CDN 地址用于加速，与服务端同时请求 |
 
 **下载策略：**
-- `downloads` 列表中的 CDN 地址与服务端自身**同时请求**，全部拉满带宽，谁先返回有效结果用谁
+- `downloads` 列表中的所有地址（官方 CDN + MCIM 镜像 + 服务端）**同时请求**，全速拉取，谁先返回有效结果用谁
 - 收到第一个完整文件后立即校验 SHA-1，通过即完成，丢弃其他正在进行的请求
 - 若文件未配置 `downloads`，则仅从服务端下载
 
@@ -103,7 +105,9 @@
       "fileSize": 25593,
       "downloads": [
         "https://mediafilez.forgecdn.net/files/7489/91/xxx.jar",
-        "https://cdn.modrinth.com/data/.../xxx.jar"
+        "https://cdn.modrinth.com/data/.../xxx.jar",
+        "https://mod.mcimirror.top/data/.../xxx.jar",
+        "https://mod.mcimirror.top/files/7489/91/xxx.jar"
       ]
     }
   }
@@ -114,7 +118,7 @@
 
 1. 服务端生成 `manifest.json` 时，对 `.jar` 文件先查询本地 `cache-store.json`
 2. **命中缓存** → 直接使用已有的下载地址
-3. **未命中** → 向 Modrinth / CurseForge CDN 查询下载地址，写入缓存
+3. **未命中** → 向 Modrinth / CurseForge API 查询下载地址，同时生成官方地址 + MCIM 镜像地址，写入缓存
 4. **查询失败** → 同样写入缓存记录（标记为无结果），避免重复无效查询
 
 ---
@@ -275,10 +279,30 @@ global.directory / global.file  （全局默认）
 
 #### 加载器安装参考
 
-实现时参考 HMCL 源码中的加载器安装逻辑（`hmcl参考代码/` 目录），主要包括：
+实现时参考 `参考代码/HMCL-main/` 中的加载器安装逻辑，主要包括：
 - Forge/NeoForge：下载 installer JAR，执行 processors 生成版本文件
 - Fabric/Quilt：调用 meta API 获取 launcherMeta，生成版本 JSON 和 libraries
 - 所有加载器的 libraries 文件放到 `.minecraft/libraries/` 共享目录
+
+#### 游戏文件下载源
+
+游戏版本文件、加载器文件、模组文件均使用**多源并发下载**，确保国内可正常下载：
+
+| 源 | 用途 | 镜像说明 |
+|---|---|---|
+| Mojang 官方 | `https://piston-data.mojang.com/` 等 | 游戏本体 |
+| BMCLAPI | `https://bmclapi2.bangbang93.com/` | Mojang/Forge/Fabric/NeoForge 镜像 |
+| Modrinth 官方 | `https://cdn.modrinth.com/` | 模组 CDN |
+| Modrinth MCIM 镜像 | `https://mod.mcimirror.top/` | Modrinth API + CDN 加速 |
+| CurseForge 官方 | `https://mediafilez.forgecdn.net/` 等 | 模组 CDN |
+| CurseForge MCIM 镜像 | `https://mod.mcimirror.top/curseforge/` | CurseForge API + CDN 加速 |
+
+**模组下载地址生成逻辑：**
+- 服务端通过 Modrinth / CurseForge API 查询模组文件的下载地址
+- 同时生成官方地址和 MCIM 镜像地址，写入 manifest 的 `downloads` 列表
+- 客户端并发请求所有地址，谁快用谁
+
+> BMCLAPI 镜像仅支持游戏本体和加载器，不支持模组。模组下载使用 Modrinth / CurseForge + MCIM 镜像。
 
 ---
 
@@ -291,7 +315,7 @@ global.directory / global.file  （全局默认）
 | **全局行为设置** | 设置目录和文件的全局默认更新行为 |
 | **刷新版本号** | 一键生成新的随机版本号写入 `version.json` |
 | **更新日志** | 编辑版本号和更新内容，支持新增/修改/删除历史版本记录 |
-| **游戏版本管理** | 配置目标游戏版本和加载器（类型+版本），见下方 `game-profile.json` 说明 |
+| **游戏版本管理** | （可选）配置目标游戏版本和加载器（类型+版本），见 `game-profile.json` 说明 |
 
 ---
 

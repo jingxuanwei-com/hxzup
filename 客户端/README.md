@@ -58,7 +58,8 @@
 | `changelogDuration` | number | 更新日志窗口自动关闭时间（秒），0 = 不自动关闭 |
 | `autoCloseChangelog` | boolean | 游戏窗口获得焦点后是否自动关闭日志窗口 |
 | `gameMainClass` | string | Minecraft 主类全限定名，Agent 会调用其 `main()` 启动游戏 |
-| `gameDir` | string | 手动指定 `.minecraft` 目录路径（可选），不填则自动向上查找 |
+| `gameDir` | string | 手动指定 `.minecraft` 目录路径（可选），不填则默认上 3 级 |
+| `mirrorUrls` | object | 镜像源配置（可选），用于加速模组和游戏文件下载 |
 
 > **多地址回退逻辑：** 请求 `version.json` / `manifest.json` 时，依次尝试 `servers[0]` → `servers[1]` → ...，第一个成功响应的地址作为本次更新的基准地址，后续文件下载也使用该地址。
 
@@ -320,7 +321,7 @@ JVM 启动（-javaagent:launcher-agent.jar）
   └─ 全部失败 → 进入错误处理
 ```
 
-> **设计原则：** 所有下载源同时全速拉取，谁先拿到完整文件用谁。CDN 和服务端带宽叠加利用，不浪费任何一个源的速度。
+> **设计原则：** 所有下载源同时全速拉取，谁先拿到完整文件用谁。CDN 和服务端带宽叠加利用，不浪费任何一个源的速度。模组下载同时使用 Modrinth / CurseForge 官方地址和 MCIM 镜像地址（`mod.mcimirror.top`）。
 
 ---
 
@@ -351,7 +352,8 @@ JVM 启动（-javaagent:launcher-agent.jar）
 │  │  1. https://mediafilez... → 超时│    │
 │  │  2. https://edge... → 超时      │    │
 │  │  3. https://cdn.modrinth...→ 404│    │
-│  │  4. http://backup1/... → 500    │    │
+│  │  4. https://mod.mcimirror...→500│    │
+│  │  5. http://backup1/... → 500    │    │
 │  └─────────────────────────────────┘    │
 │                                         │
 │  ┌──────────┐  ┌──────────┐            │
@@ -383,7 +385,11 @@ JVM 启动（-javaagent:launcher-agent.jar）
   [1] https://mediafilez.forgecdn.net/files/... → 超时 (30s)
   [2] https://edge.forgecdn.net/files/...       → 超时 (30s)
   [3] https://cdn.modrinth.com/data/...         → HTTP 404
-  [4] http://backup1.example.com/1/mods/...     → HTTP 500
+  [4] https://mod.mcimirror.top/data/...        → HTTP 500
+  [5] https://mod.mcimirror.top/files/...       → HTTP 500
+  [6] http://backup1.example.com/1/mods/...     → HTTP 500
+  [5] https://mod.mcimirror.top/files/...       → HTTP 500
+  [6] http://backup1.example.com/1/mods/...     → HTTP 500
 
 本地环境:
   OS: Windows 11
