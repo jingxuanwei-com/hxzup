@@ -1,0 +1,32 @@
+{
+  "rules": {
+    "global": {
+      "directory": "permissive",
+      "file": "check_and_overwrite"
+    },
+    "directory": {
+      "1/mods/": {
+        "behavior": "strict",
+        "description": "核心模组目录，严禁私自添加无关文件，多余文件将被清理"
+      },
+      "1/config/": {
+        "behavior": "permissive",
+        "description": "配置文件目录，允许玩家保留自定义修改或自行添加配置"
+      },
+      "0/": {
+        "behavior": "strict",
+        "description": "更新器所在目录，严禁私自添加无关文件，多余文件将被清理"
+      }
+    },
+    "file": {
+      "1/config/options.json": {
+        "behavior": "skip_if_modified",
+        "description": "游戏设置文件，玩家修改过则保留"
+      },
+      "0/config/2.json": {
+        "behavior": "check_and_overwrite",
+        "description": "更新器目录下的受保护文件，强制校验哈希"
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "files": [
+    {
+      "path": "1/mods/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+      "sha1": "d613dbc38ca5bcc718408db432385c2e67ac763f",
+      "fileSize": 25593,
+      "action": "check_and_overwrite",
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://edge.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://cdn.modrinth.com/data/Gi02250Z/versions/cHGan9fQ/Almanac-1.21.1-2-neoforge-1.5.2.jar"
+      ]
+    },
+    {
+      "path": "0/config/some_mod.cfg",
+      "sha1": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4",
+      "fileSize": 1024
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "servers": [
+    "http://main-server.com:8080",
+    "http://backup1.example.com:8080",
+    "http://backup2.example.com:8080"
+  ],
+  "retryCount": 3,
+  "downloadTimeout": 30,
+  "parallelDownloads": 8,
+  "showChangelog": true,
+  "changelogDuration": 15,
+  "autoCloseChangelog": true,
+  "gameMainClass": "net.minecraft.client.main.Main"
+}

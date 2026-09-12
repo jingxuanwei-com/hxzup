@@ -1,0 +1,18 @@
+{
+  "cache": {
+    "d613dbc38ca5bcc718408db432385c2e67ac763f": {
+      "fileSize": 25593,
+      "downloads": [
+        "https://mediafilez.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://edge.forgecdn.net/files/7489/91/Almanac-1.21.1-2-neoforge-1.5.2.jar",
+        "https://cdn.modrinth.com/data/Gi02250Z/versions/cHGan9fQ/Almanac-1.21.1-2-neoforge-1.5.2.jar"
+      ]
+    },
+    "这是shi1的值": {
+      "fileSize": 102400,
+      "downloads": [
+        "https://example.com/another-mod.jar"
+      ]
+    }
+  }
+}
