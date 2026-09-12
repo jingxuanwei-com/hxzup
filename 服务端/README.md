@@ -70,12 +70,12 @@
 | `sha1` | 文件 SHA-1 校验值 |
 | `fileSize` | 文件大小（字节） |
 | `action` | 更新行为（可选），可选值见下方行为模式表；为空则按 `action.json` 中的规则匹配 |
-| `downloads` | 下载地址列表（可选） |
+| `downloads` | 下载地址列表（可选），多个 CDN 地址用于加速，与服务端同时请求 |
 
-**下载地址回退规则：**
-- 若文件配置了 `downloads` 列表 → 依次尝试列表中的地址（多线程下载，线程数由客户端 `parallelDownloads` 配置）
-- 若文件**未配置** `downloads`或者下载失败 → 客户端使用 **服务端地址 + path** 拼接下载
-  - 例：`path = "1/mods/xxx.jar"` → `http://服务器地址/1/mods/xxx.jar`
+**下载策略：**
+- `downloads` 列表中的 CDN 地址与服务端自身**同时请求**，全部拉满带宽，谁先返回有效结果用谁
+- 收到第一个完整文件后立即校验 SHA-1，通过即完成，丢弃其他正在进行的请求
+- 若文件未配置 `downloads`，则仅从服务端下载
 
 ---
 
@@ -243,8 +243,9 @@ global.directory / global.file  （全局默认）
   ├─ 5. 对比 local-manifest.json             │
   │   ├─ 文件 SHA1 一致 → 跳过               │
   │   └─ 不一致/新增 → 下载文件               │
-  │       ├─ 有 downloads → 多线程下载        │
-  │       └─ 无 downloads → 从基准地址下载    │
+  │       ├─ 有 downloads → 所有 CDN + 服务端 │
+  │       │   同时全速拉取，谁快用谁          │
+  │       └─ 无 downloads → 从服务端下载      │
   │       ├─ 桌面端 → Swing 进度条            │
   │       └─ Android → 通知栏进度条           │
   │                                          │
