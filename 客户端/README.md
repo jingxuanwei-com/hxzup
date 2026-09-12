@@ -19,7 +19,8 @@
 └── .updater/                      # 更新器内部数据（隐藏目录）
     ├── local-version.json         # 上次拉取的版本号
     ├── local-manifest.json        # 上次拉取的完整清单
-    └── local-changelog.json       # 上次拉取的更新日志（用于展示）
+    ├── local-changelog.json       # 上次拉取的更新日志（用于展示）
+    └── local-game-profile.json    # 上次拉取的游戏版本/加载器配置（可选）
 ```
 
 ---
@@ -55,6 +56,7 @@
 | `changelogDuration` | number | 更新日志窗口自动关闭时间（秒），0 = 不自动关闭 |
 | `autoCloseChangelog` | boolean | 游戏窗口获得焦点后是否自动关闭日志窗口 |
 | `gameMainClass` | string | Minecraft 主类全限定名，Agent 会调用其 `main()` 启动游戏 |
+| `gameDir` | string | 手动指定 `.minecraft` 目录路径（可选），不填则自动向上查找 |
 
 > **多地址回退逻辑：** 请求 `version.json` / `manifest.json` 时，依次尝试 `servers[0]` → `servers[1]` → ...，第一个成功响应的地址作为本次更新的基准地址，后续文件下载也使用该地址。
 

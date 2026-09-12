@@ -15,7 +15,8 @@
     ├── version.json       # 随机版本号（供客户端快速判断是否有更新）
     ├── cache-store.json   # 下载地址本地缓存（避免重复查询）
     ├── action.json        # 更新行为规则（全局/目录/文件三级）
-    ├── changelog.json        # 版本号 & 更新日志（供玩家查看）
+    ├── changelog.json     # 版本号 & 更新日志（供玩家查看）
+    ├── game-profile.json  # 游戏版本 & 加载器配置（可选）
     │   
     ├── 0/                 # → 客户端当前目录（更新器所在目录）
     ├── 1/                 # → 客户端上级目录
@@ -207,6 +208,84 @@ global.directory / global.file  （全局默认）
 - `history`：更新日志列表，**第一条为最新版本**，直接展示其版本号、日期和更新内容；历史版本默认折叠，点击展开查看
 - ⚠️ 此版本号**不作为更新判断依据**，仅用于展示
 - **客户端拉取接口**：`GET /changelog.json`，客户端更新完成后拉取并缓存到本地
+
+---
+
+### 3.6 `game-profile.json` — 游戏版本与加载器配置（可选）
+
+> **此文件为可选功能。** 不配置则更新器只做文件同步，不处理游戏版本和加载器。
+
+```json
+{
+  "gameVersion": "1.21.1",
+  "loader": {
+    "type": "neoforge",
+    "version": "21.1.1"
+  }
+}
+```
+
+| 字段 | 类型 | 说明 |
+|---|---|---|
+| `gameVersion` | string | 目标 Minecraft 版本号（如 `1.21.1`、`1.20.1`） |
+| `loader.type` | string | 加载器类型，可选值：`forge`、`neoforge`、`fabric`、`quilt`、`optifine` |
+| `loader.version` | string | 加载器版本号 |
+
+#### 需求说明
+
+1. **管理面板**可配置游戏版本和加载器（类型+版本），写入 `game-profile.json`
+2. **客户端**启动时拉取此文件，与本地已安装的版本/加载器对比
+3. 如果版本或加载器有变化，客户端需要：
+   - 下载新版本的版本 JSON、客户端 JAR、libraries 等文件
+   - 安装新加载器（参考 HMCL 的加载器安装逻辑）
+   - 文件放到 `.minecraft/versions/<版本ID>/` 和 `.minecraft/libraries/` 下
+4. 加载器安装完成后，**当前启动的 classpath 不变**，更新仅对下次启动生效
+5. 客户端不需要实现完整的启动器功能，只需保证文件到位，启动器会自动识别
+
+#### `.minecraft` 目录定位
+
+更新器需要自动定位 `.minecraft` 目录，因为更新器自身的位置不固定：
+
+```
+可能的目录结构：
+├── .minecraft/update/                    ← 更新器在 .minecraft 内
+│   └── updater-1.0.0.jar
+├── 整合包名/.minecraft/update/           ← 更新器在整合包子目录内
+│   └── updater-1.0.0.jar
+├── 整合包名/update/                      ← 更新器直接在整合包目录下
+│   └── updater-1.0.0.jar
+└── 整合包名/更新器/                      ← 自定义目录名
+    └── updater-1.0.0.jar
+```
+
+**定位规则（从更新器所在目录向上查找）：**
+1. 从 updater JAR 所在目录开始
+2. 逐级向上查找，找到包含 `versions/` 子目录的目录即为 `.minecraft`
+3. 最多向上查找 5 级，找不到则报错
+4. 也可以在 `config.json` 中手动指定 `gameDir` 字段覆盖自动检测
+
+```
+查找示例：
+updater 在 /游戏/整合包/.minecraft/update/
+  → 检查 /游戏/整合包/.minecraft/update/        → 无 versions/
+  → 检查 /游戏/整合包/.minecraft/                → 有 versions/  ✅ 找到
+```
+
+#### 版本 ID 命名约定
+
+| 加载器 | 版本 ID 格式 | 示例 |
+|---|---|---|
+| 原版 | `{gameVersion}` | `1.21.1` |
+| Forge | `{gameVersion}-forge-{loaderVersion}` | `1.21.1-neoforge-21.1.1` |
+| Fabric | `{gameVersion}-fabric-{loaderVersion}` | `1.20.1-fabric-0.15.0` |
+| Quilt | `{gameVersion}-quilt-{loaderVersion}` | `1.20.1-quilt-0.22.0` |
+
+#### 加载器安装参考
+
+实现时参考 HMCL 源码中的加载器安装逻辑（`hmcl参考代码/` 目录），主要包括：
+- Forge/NeoForge：下载 installer JAR，执行 processors 生成版本文件
+- Fabric/Quilt：调用 meta API 获取 launcherMeta，生成版本 JSON 和 libraries
+- 所有加载器的 libraries 文件放到 `.minecraft/libraries/` 共享目录
 
 ---
 

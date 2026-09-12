@@ -10,5 +10,6 @@
   "showChangelog": true,
   "changelogDuration": 15,
   "autoCloseChangelog": true,
-  "gameMainClass": "net.minecraft.client.main.Main"
+  "gameMainClass": "net.minecraft.client.main.Main",
+  "gameDir": ""
 }
